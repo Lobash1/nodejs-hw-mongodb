@@ -2,15 +2,11 @@ import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import {
-  handleGetAllContacts,
-  handleGetContactById,
-} from './controllers/contactsController.js';
-
+import contactsRouter from './routers/contacts.js';
+import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 dotenv.config();
-
+const PORT = process.env.PORT || 3000;
 export const setupServer = () => {
-  // Налаштування cors та логгера pino.
   const app = express();
   app.use(express.json());
   app.use(cors());
@@ -22,21 +18,15 @@ export const setupServer = () => {
     }),
   );
 
-  // hello server
-  //   app.use((req, res) => {
-  //     res.json({ message: 'Hello server!!!' });
-  //   });
-
-  app.get('/contacts', handleGetAllContacts);
-  app.get('/contacts/:contactId', handleGetContactById);
-
-  // Обробку неіснуючих роутів (повертає статус 404 і відповідне повідомлення)
-  app.use((req, res) => {
-    res.status(404).json({ message: 'Not found' });
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'hello world',
+    });
   });
 
-  //zapusk servera
-  const PORT = process.env.PORT || 3000;
+  app.use('/api/contacts', contactsRouter);
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
