@@ -33,6 +33,6 @@ router.patch(
   ctrlWrapper(patchContactController),
 );
 
-router.delete('/:contactId', ctrlWrapper(deleteContactController));
+router.delete('/:contactId', isValidId, ctrlWrapper(deleteContactController));
 
 export default router;
