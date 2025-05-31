@@ -9,8 +9,11 @@ const contactSchema = new mongoose.Schema(
     contactType: {
       type: String,
       enum: ['work', 'home', 'personal'],
-      required: true,
       default: 'personal',
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
   },
   {
