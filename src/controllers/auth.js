@@ -28,8 +28,8 @@ export const loginUserController = async (req, res) => {
     expires: session.refreshTokenValidUntil,
   });
 
-  res.status(201).json({
-    status: 201,
+  res.status(200).json({
+    status: 200,
     message: 'Successfully Login a user!',
     data: { accessToken: session.accessToken },
   });
@@ -70,8 +70,8 @@ export const refreshController = async (req, res) => {
     expires: session.refreshTokenValidUntil,
   });
 
-  res.status(201).json({
-    status: 201,
+  res.status(200).json({
+    status: 200,
     message: 'Refresh completed successfully!',
     data: { accessToken: session.accessToken },
   });
