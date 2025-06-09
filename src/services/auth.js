@@ -94,8 +94,8 @@ export const requestResetToken = async (email) => {
       name: user.name,
     },
     getEnvVar('JWT_SECRET'),
-    // !==============================================
-    { expiresIn: '500m' },
+
+    { expiresIn: '5m' },
   );
 
   const link = `${getEnvVar(
