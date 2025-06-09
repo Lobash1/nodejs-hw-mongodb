@@ -94,12 +94,57 @@ export const requestResetToken = async (email) => {
       name: user.name,
     },
     getEnvVar('JWT_SECRET'),
-    { expiresIn: '5m' },
+    // !==============================================
+    { expiresIn: '500m' },
   );
+
+  const link = `${getEnvVar(
+    'APP_DOMAIN',
+  )}/reset-password-email/?token=${token}`;
 
   const html = template({
     name: user.name || user.email,
-    link: `http://localhost:3000/reset-password-email/?token=${token}`,
+    link,
   });
-  await sendMail(user.email, 'Reset your password', html);
+  try {
+    await sendMail(user.email, 'Reset your password', html);
+    return {
+      status: 200,
+      message: 'Reset password email has been successfully sent.',
+      data: {},
+    };
+  } catch (error) {
+    console.error('Send mail error:', error);
+    throw createHttpError(
+      500,
+      'Failed to send the email, please try again later.',
+    );
+  }
+};
+
+export const resetPassword = async (password, token) => {
+  try {
+    const decoded = jwt.verify(token, getEnvVar('JWT_SECRET'));
+
+    const user = await User.findById(decoded.sub);
+
+    if (user === null) {
+      throw new createHttpError(404, 'User not found');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+
+    await Session.deleteMany({ userId: user._id });
+  } catch (error) {
+    if (
+      error.name === 'TokenExpiredError' ||
+      error.name === 'JsonWebTokenError'
+    ) {
+      throw createHttpError(401, 'Token is expired or invalid.');
+    }
+
+    throw error;
+  }
 };

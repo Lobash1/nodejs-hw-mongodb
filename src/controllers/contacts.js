@@ -1,3 +1,6 @@
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
+
 import createHttpError from 'http-errors';
 import {
   getAllContacts,
@@ -8,6 +11,8 @@ import {
 } from '../services/contacts.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const handleGetAllContacts = async (req, res, next) => {
   try {
@@ -57,10 +62,32 @@ export const handleGetContactById = async (req, res, next) => {
 export const createContactController = async (req, res, next) => {
   try {
     const userId = req.user._id;
+    let photo = null;
+
+    const tempPath = req.file.path;
+
+    if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
+      const result = await saveFileToCloudinary(tempPath);
+      await fs.unlink(tempPath); // Видаляємо файл з tmp
+      photo = result.secure_url;
+    } else {
+      const newPath = path.resolve(
+        'src',
+        'uploads',
+        'photo',
+        req.file.filename,
+      );
+
+      await fs.mkdir(path.dirname(newPath), { recursive: true });
+
+      await fs.rename(tempPath, newPath);
+      photo = `http://localhost:3000/photo/${req.file.filename}`;
+    }
 
     const contact = await createContact({
       ...req.body,
       userId,
+      photo,
     });
 
     res.status(201).json({
@@ -77,8 +104,29 @@ export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
     const userId = req.user._id;
+    const updatedData = { ...req.body };
 
-    const result = await patchContact({ contactId, userId, ...req.body });
+    if (req.file) {
+      const tempPath = req.file.path;
+
+      if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
+        const result = await saveFileToCloudinary(tempPath);
+        await fs.unlink(tempPath);
+        updatedData.photo = result.secure_url;
+      } else {
+        const newPath = path.resolve(
+          'src',
+          'uploads',
+          'photo',
+          req.file.filename,
+        );
+        await fs.mkdir(path.dirname(newPath), { recursive: true });
+        await fs.rename(tempPath, newPath);
+        updatedData.photo = `http://localhost:3000/photo/${req.file.filename}`;
+      }
+    }
+
+    const result = await patchContact({ contactId, userId, ...updatedData });
 
     if (!result) {
       return next(createHttpError(404, 'Contact not found'));
@@ -87,7 +135,7 @@ export const patchContactController = async (req, res, next) => {
     res.json({
       status: 200,
       message: 'Successfully patched a contact!',
-      data: result.contact,
+      data: result,
     });
   } catch (error) {
     next(error);
