@@ -6,13 +6,14 @@ import {
   getAllContacts,
   getContactById,
   createContact,
-  patchContact,
+  // patchContact,
   deleteContact,
 } from '../services/contacts.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
+import { Contact } from '../db/models/contacts.js';
 
 export const handleGetAllContacts = async (req, res, next) => {
   try {
@@ -103,7 +104,6 @@ export const createContactController = async (req, res, next) => {
 export const patchContactController = async (req, res, next) => {
   try {
     const { contactId } = req.params;
-    const userId = req.user._id;
     const updatedData = { ...req.body };
 
     if (req.file) {
@@ -126,7 +126,10 @@ export const patchContactController = async (req, res, next) => {
       }
     }
 
-    const result = await patchContact({ contactId, userId, ...updatedData });
+    // const result = await patchContact({ contactId, userId, ...updatedData });
+    const result = await Contact.findByIdAndUpdate(contactId, updatedData, {
+      new: true,
+    });
 
     if (!result) {
       return next(createHttpError(404, 'Contact not found'));
