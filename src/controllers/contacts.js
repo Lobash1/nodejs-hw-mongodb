@@ -61,28 +61,32 @@ export const handleGetContactById = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res, next) => {
+  console.log('req.file:', req.file);
+
   try {
     const userId = req.user._id;
     let photo = null;
 
-    const tempPath = req.file.path;
+    if (req.file && req.file.path) {
+      const tempPath = req.file.path;
 
-    if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
-      const result = await saveFileToCloudinary(tempPath);
-      await fs.unlink(tempPath); // Видаляємо файл з tmp
-      photo = result.secure_url;
-    } else {
-      const newPath = path.resolve(
-        'src',
-        'uploads',
-        'photo',
-        req.file.filename,
-      );
+      if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
+        const result = await saveFileToCloudinary(tempPath);
+        await fs.unlink(tempPath); // Видаляємо файл з tmp
+        photo = result.secure_url;
+      } else {
+        const newPath = path.resolve(
+          'src',
+          'uploads',
+          'photo',
+          req.file.filename,
+        );
 
-      await fs.mkdir(path.dirname(newPath), { recursive: true });
+        await fs.mkdir(path.dirname(newPath), { recursive: true });
 
-      await fs.rename(tempPath, newPath);
-      photo = `http://localhost:3000/photo/${req.file.filename}`;
+        await fs.rename(tempPath, newPath);
+        photo = `http://localhost:3000/photo/${req.file.filename}`;
+      }
     }
 
     const contact = await createContact({
@@ -106,7 +110,7 @@ export const patchContactController = async (req, res, next) => {
     const { contactId } = req.params;
     const updatedData = { ...req.body };
 
-    if (req.file) {
+    if (req.file?.path) {
       const tempPath = req.file.path;
 
       if (getEnvVar('UPLOAD_TO_CLOUDINARY') === 'true') {
