@@ -45,7 +45,10 @@ requestBody:
             example: 'https://res.cloudinary.com/dkbceyoqy/image/upload/v1749469763/ink2frx6ex2mtmoutxlo.png'
 responses:
   '200':
-    $ref: '../../../components/responses/200.yaml'
-
+    $ref: ../../../components/responses/200patch.yaml
+  '401':
+    $ref: ../../../components/responses/401.yaml
   '404':
     $ref: '../../../components/responses/404.yaml'
+  '500':
+    $ref: ../../../components/responses/500.yaml
