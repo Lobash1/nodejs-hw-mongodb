@@ -1,20 +1,21 @@
 tags:
   - Auth
-summary: Logout user
-operationId: logoutUser
-description: Logout user
+summary: Logout from specific session
+operationId: logoutSession
+description: Logout user from a specific session by ID
 security:
   - bearerAuth: []
 parameters:
-  - in: path
+  - in: query
     name: sessionId
     required: true
+    description: ID of the session to terminate
     schema:
       type: string
       example: 684df4a5c8cf9d247b1e1ff4
 responses:
   '204':
-    description: Successfully logout user! There is nothing to return
+    description: Successfully logged out from session
   '401':
     $ref: '../../components/responses/401.yaml'
   '404':

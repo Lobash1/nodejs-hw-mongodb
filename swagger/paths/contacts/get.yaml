@@ -14,6 +14,7 @@ parameters:
       type: integer
       minimum: 1
       example: 1
+
   - name: perPage
     in: query
     description: 'Number of items per page (default: 10)'
@@ -60,10 +61,49 @@ parameters:
 
 responses:
   '200':
-    $ref: ../../components/responses/200.yaml
+    description: Successfully retrieved contacts
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - message
+            - contacts
+            - page
+            - perPage
+            - totalItems
+            - totalPages
+            - hasPreviousPage
+            - hasNextPage
+          properties:
+            message:
+              type: string
+              example: Successfully found contacts!
+            contacts:
+              type: array
+              items:
+                $ref: ../../components/schemas/contacts.yaml
+            page:
+              type: integer
+              example: 1
+            perPage:
+              type: integer
+              example: 10
+            totalItems:
+              type: integer
+              example: 35
+            totalPages:
+              type: integer
+              example: 4
+            hasPreviousPage:
+              type: boolean
+              example: false
+            hasNextPage:
+              type: boolean
+              example: true
+
   '401':
     $ref: ../../components/responses/401.yaml
-  '404':
-    $ref: '../../components/responses/404.yaml'
+
   '500':
     $ref: ../../components/responses/500.yaml

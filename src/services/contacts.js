@@ -42,22 +42,17 @@ export const createContact = async (payload) => {
   return await Contact.create(payload);
 };
 
-// export const patchContact = async ({ contactId, userId, ...payload }) => {
-//   const updated = await Contact.findOneAndUpdate(
-//     { _id: contactId, userId },
-//     payload,
-//     { new: true },
-//   );
-
-//   if (!updated) {
-//     return null;
-//   }
-
-//   return {
-//     contact: updated,
-//     isNew: false,
-//   };
-// };
+export const patchContact = async ({ contactId, userId, updateData }) => {
+  const updated = await Contact.findOneAndUpdate(
+    { _id: contactId, userId },
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return updated;
+};
 
 export const deleteContact = async ({ contactId, userId }) => {
   return await Contact.findOneAndDelete({

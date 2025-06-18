@@ -6,19 +6,10 @@ content:
       required:
         - status
         - message
-        - data
       properties:
         status:
           type: integer
           example: 401
         message:
           type: string
-          example: Unauthorized Error
-        data:
-          type: object
-          required:
-            - message
-          properties:
-            message:
-              type: string
-              example: 'Access token not provided'
+          example: 'Access token not provided'

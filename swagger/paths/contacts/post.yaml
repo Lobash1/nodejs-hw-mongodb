@@ -49,17 +49,13 @@ responses:
         schema:
           type: object
           required:
-            - status
             - message
-            - data
+            - contact
           properties:
-            status:
-              type: integer
-              example: 201
             message:
               type: string
-              example: Successfully created a contact!
-            data:
+              example: Contact created successfully
+            contact:
               $ref: ../../components/schemas/contacts.yaml
 
   '401':

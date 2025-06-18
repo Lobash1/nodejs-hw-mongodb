@@ -6,7 +6,7 @@ description: Refresh user session
 security:
   - bearerAuth: []
 parameters:
-  - in: path
+  - in: query
     name: sessionId
     required: true
     schema:
