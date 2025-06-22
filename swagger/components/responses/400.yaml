@@ -12,4 +12,4 @@ content:
           example: 400
         message:
           type: string
-          example: 'Invalid request data'
+          example: 'Invalid request data!'
